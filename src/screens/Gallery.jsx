@@ -111,7 +111,7 @@ function ComparePage({ a: a0, b: b0 }) {
     ))}</div>
   );
   return (
-    <Page title="Compare" subtitle={`${days} days apart${dw != null ? ` · ${dw > 0 ? '+' : ''}${round(s.profile.units === 'imperial' ? dw * 2.2046 : dw, 1)} ${weightUnit(s.profile.units)}` : ''}`}>
+    <Page title="Compare" subtitle={`${days} ${days === 1 ? 'day' : 'days'} apart${dw != null ? ` · ${dw > 0 ? '+' : ''}${round(s.profile.units === 'imperial' ? dw * 2.2046 : dw, 1)} ${weightUnit(s.profile.units)}` : ''}`}>
       <div class="stack">
         <Segmented size="sm" value={mode} onChange={setMode} options={[{ id: 'slide', label: 'Slider' }, { id: 'side', label: 'Side by side' }]} />
         {mode === 'slide' ? (

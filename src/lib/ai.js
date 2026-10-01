@@ -32,7 +32,7 @@ export const PROVIDERS = {
   },
   custom: {
     id: 'custom', name: 'Custom (OpenAI-compatible)', kind: 'openai', needsKey: false, vision: true,
-    base: '', models: [], blurb: 'Any OpenAI-style endpoint: Ollama on your network, LM Studio, Together, Mistral…',
+    base: '', models: [], blurb: 'Any https OpenAI-style endpoint: Together, Mistral, a tunnelled Ollama…',
   },
 };
 export const AUTO_ORDER = ['gemini', 'groq', 'openrouter', 'pollinations'];

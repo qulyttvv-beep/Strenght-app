@@ -2,6 +2,7 @@ import { useState, useMemo } from 'preact/hooks';
 import { Search, Plus, Check, Dumbbell, Trophy, Info } from 'lucide-preact';
 import { Page, Sheet, Btn, Chip, Field, Segmented, Card, Empty, cx, NumInput } from '../ui/kit.jsx';
 import { LineChart } from '../ui/charts.jsx';
+import { BodyMap } from '../ui/bodymap.jsx';
 import { openPage, openSheet, closeTop, toast } from '../ui/nav.js';
 import { useStore, addCustomExercise, deleteCustomExercise, computeRecords } from '../lib/store.js';
 import { allExercises, getExercise, MUSCLES, MUSCLE_ORDER, EQUIPMENT, TYPE_LABEL } from '../lib/exercises.js';
@@ -86,9 +87,10 @@ export function ExerciseDetail({ id }) {
   });
   const rec = computeRecords(s.history)[id];
   return (
-    <Sheet title={ex.name} tall={sessions.length > 0}>
+    <Sheet title={ex.name} tall={pts.length > 1}>
       <div class="stack">
         <div class="chips"><span class="chip on"><MuscleDot m={ex.muscle} />{MUSCLES[ex.muscle].label}</span>{ex.sec.map((m) => <span class="chip" key={m}>{MUSCLES[m]?.label}</span>)}<span class="chip">{EQUIPMENT[ex.equip]}</span></div>
+        <div style="max-width:260px;margin:0 auto;width:100%"><BodyMap weights={{ ...Object.fromEntries(ex.sec.map((m) => [m, 0.45])), [ex.muscle]: 1 }} labels={false} /></div>
         {ex.cue && <div class="notice"><Dumbbell size={20} /><div>{ex.cue}</div></div>}
         {rec && ex.type === 'wr' && (
           <div class="grid3">

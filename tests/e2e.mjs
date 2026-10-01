@@ -145,6 +145,15 @@ await tapText('Done');
 await page.waitForTimeout(500);
 check(await page.getByText('History').count() > 0, 'history section visible');
 
+section('Exercise library & muscle map');
+await page.getByRole('button', { name: 'Exercise library' }).click(); await page.waitForTimeout(500);
+await shot('library');
+await page.locator('.row', { hasText: 'Barbell Bench Press' }).first().click(); await page.waitForTimeout(600);
+await shot('exercise-detail');
+check(await page.locator('svg[aria-label="Front"]').count() > 0, 'muscle map rendered in exercise detail');
+await back(); await back(); await page.waitForTimeout(400);
+await page.evaluate(() => window.scrollTo(0, 0)); await page.locator('.screen').evaluate((el) => { el.scrollTop = 700; }); await shot('train-muscle-balance');
+
 section('Program builder (offline + AI)');
 await page.getByRole('button', { name: /Build plan/ }).click(); await page.waitForTimeout(500);
 await shot('builder');
@@ -239,6 +248,36 @@ await tapText('Progress', { exact: true }); await tapText('Photos'); await page.
 check(await page.locator('.photo-grid .ph').count() === 2, 'photos survived reload');
 
 await shot('end');
+
+section('Teen mode (age 15) in a fresh profile');
+{
+  const tctx = await browser.newContext({ viewport: { width: 412, height: 915 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
+  const tp = await tctx.newPage();
+  tp.on('pageerror', (e) => problems.push('teen pageerror: ' + e.message));
+  tp.on('console', (m) => { if (m.type() === 'error') problems.push('teen console: ' + m.text()); });
+  await tctx.route('**/*', (r) => (r.request().url().startsWith(`http://localhost:${PORT}`) ? r.continue() : r.abort()));
+  await tp.goto(`http://localhost:${PORT}/`); await tp.waitForSelector('.onb');
+  await tp.getByText('Get started', { exact: true }).click();
+  await tp.selectOption('select >> nth=0', '10'); await tp.selectOption('select >> nth=1', '2'); await tp.selectOption('select >> nth=2', String(yr - 15));
+  await tp.getByText('Teen mode is on', { exact: false }).first().waitFor();
+  await tp.getByRole('button', { name: 'Continue' }).click();
+  await tp.getByRole('button', { name: 'Female', exact: true }).click();
+  await tp.getByRole('button', { name: 'Continue' }).click();
+  await tp.getByText('Lose fat', { exact: true }).click();
+  check(await tp.getByText('Pace', { exact: true }).count() === 0, 'teens are not offered a weight-loss pace');
+  await tp.getByRole('button', { name: 'Continue' }).click(); await tp.getByRole('button', { name: 'Continue' }).click(); await tp.getByRole('button', { name: 'Continue' }).click();
+  await tp.getByText('Your daily plan').waitFor();
+  const kcal = parseInt(((await tp.locator('.hero').first().innerText()).match(/\n([\d,]+)\n/) || [0, '0'])[1].replace(/,/g, ''), 10);
+  check(kcal >= 1600, `teen girl calorie target respects the 1600 kcal floor (${kcal})`);
+  await tp.getByRole('button', { name: 'Start training' }).click(); await tp.waitForSelector('.tabbar');
+  check(await tp.getByText('Teen mode:', { exact: false }).count() > 0, 'home shows the teen-mode notice');
+  await tp.getByText('Progress', { exact: true }).click(); await tp.waitForTimeout(300);
+  await tp.getByText('Body fat estimator').first().click(); await tp.waitForTimeout(400);
+  check(await tp.getByRole('button', { name: 'AI photo' }).count() === 0, 'AI photo body-fat option is hidden for under-18s');
+  check(await tp.getByText('still growing', { exact: false }).count() > 0, 'teen body-fat caveat is shown');
+  await tp.screenshot({ path: path.join(SHOTS, 'teen-bodyfat.png') });
+  await tctx.close();
+}
 await browser.close(); cleanup();
 fs.writeFileSync(path.join(SHOTS, 'ai-calls.json'), JSON.stringify(aiCalls.map((c) => ({ url: c.url, body: c.body.slice(0, 600) })), null, 1));
 console.log('\nAI calls made:', aiCalls.length);

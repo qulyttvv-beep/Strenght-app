@@ -127,7 +127,7 @@ function AiSettingsPage() {
                   <button class="iconbtn" style="background:var(--card2)" onClick={() => setShow(!show)} aria-label="Show key">{show ? <EyeOff size={20} /> : <Eye size={20} />}</button></div>
               </Field>
             )}
-            {id === 'custom' && <><Field label="Base URL" hint="e.g. https://api.together.xyz/v1 or http://192.168.1.20:11434/v1"><input class="input" placeholder="https://…/v1" value={ai.customBase || ''} onInput={(e) => setAi({ customBase: e.currentTarget.value })} /></Field><Field label="API key (if needed)"><input class="input" type="password" value={key} onInput={(e) => setAi({ keys: { ...ai.keys, custom: e.currentTarget.value.trim() } })} /></Field></>}
+            {id === 'custom' && <><Field label="Base URL" hint="Must be https (plain http is blocked for safety), e.g. https://api.together.xyz/v1"><input class="input" placeholder="https://…/v1" value={ai.customBase || ''} onInput={(e) => setAi({ customBase: e.currentTarget.value })} /></Field><Field label="API key (if needed)"><input class="input" type="password" value={key} onInput={(e) => setAi({ keys: { ...ai.keys, custom: e.currentTarget.value.trim() } })} /></Field></>}
             <Field label="Model" hint="Leave blank for the recommended default. Free models change over time – use “Find models” if one stops working.">
               <input class="input" placeholder={active.models[0] || 'model id'} value={ai.models?.[id] || ''} onInput={(e) => setAi({ models: { ...ai.models, [id]: e.currentTarget.value.trim() } })} />
             </Field>

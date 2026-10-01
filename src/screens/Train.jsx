@@ -10,6 +10,7 @@ import { fmtDayLong, fmtDay, fmtDurationShort, dispWeight, weightUnit, fmtNum, u
 import { WorkoutPage } from './Workout.jsx';
 import { openRoutineEditor, openProgramBuilder } from './Programs.jsx';
 import { openLibrary } from './Exercises.jsx';
+import { BodyMap } from '../ui/bodymap.jsx';
 
 function RoutineMenu({ routine }) {
   return (
@@ -126,12 +127,13 @@ export function Train() {
 
       <Section title="Muscle balance" sub="Working sets this week (aim for 10–20 per muscle)">
         <Card>
+          <div style="max-width:320px;margin:0 auto 14px"><BodyMap weights={Object.fromEntries(Object.entries(sets).map(([m, v]) => [m, Math.min(1, v / 14)]))} /></div>
           <div class="stack-sm">
             {musc.map((m) => {
               const v = Math.round((sets[m] || 0) * 10) / 10;
               return (
                 <div class="row-flex" key={m}>
-                  <div style="width:84px" class="small bold row-flex gap8"><span class="muscle-dot" style={{ background: MUSCLES[m].color }} />{MUSCLES[m].label}</div>
+                  <div style="width:104px;flex:none" class="small bold row-flex gap8"><span class="muscle-dot" style={{ background: MUSCLES[m].color }} />{MUSCLES[m].label}</div>
                   <div class="grow"><Bar value={v} max={20} color={v >= 10 ? MUSCLES[m].color : `color-mix(in srgb, ${MUSCLES[m].color} 55%, var(--card3))`} height={9} /></div>
                   <div class="num small bold" style="width:26px;text-align:right">{v ? round(v) : 0}</div>
                 </div>
